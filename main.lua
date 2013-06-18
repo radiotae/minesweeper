@@ -22,7 +22,7 @@ function love.load()
 	--screen size
 	love.graphics.setMode(WIDTH*SCALE, HEIGHT*SCALE, false, false)
 	
-	--looping through a 5 by 5 array, given the x and y values I put the image, x and y value locations in the array
+	--looping through a col by row array, given the x and y values I put the image, x and y value locations in the array
 	for x=1, cols, 1 do
 		grid[x] = {}
 		for y=1, rows, 1 do
@@ -36,29 +36,13 @@ function love.load()
 	
 	--I set the bombs
 	local bombs = 0
-	
 	while bombs < bomblim do
-		for x=1, cols, 1 do
-			for y=1, rows, 1 do
-				if grid[x][y].bomb == false then
-					local bombo = math.random(3)
-					--bombo = 1
-					if bombo == 1 then
-						grid[x][y].bomb = true
-						bombs = bombs + 1
-					end
-				end
-				
-				if bombs == bomblim then
-					break
-				end
-				
-			end
-			
-			if bombs == bomblim then
-				break
-			end
-			
+		local coordx = math.random(cols)
+		local coordy = math.random(rows)
+		
+		if grid[coordx][coordy].bomb == false then
+			grid[coordx][coordy].bomb = true
+			bombs = bombs + 1
 		end
 	end
 	--sets warn variable to show how many bombs are around said tile IF the tile isn't a bomb itself
