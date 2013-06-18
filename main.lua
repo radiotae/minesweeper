@@ -7,8 +7,8 @@ HEIGHT = 200
 --y=1
 --POSSIBLE USER INPUT LATER
 SCALE = 3
-cols = 6
-rows = 5
+cols = 13
+rows = 9
 bomblim = 7
 
 --setting mouse properties here
@@ -29,7 +29,7 @@ function love.load()
 			
 			local state1 = love.graphics.newImage("/data/neutralState.png")
 			
-			grid[x][y] = {xVal = 128+((x-1)*60), yVal = 100+((y-1)*60), image = state1, bomb = false, check = false, warns = 0}
+			grid[x][y] = {xVal = 27+((x-1)*55), yVal = 60+((y-1)*55), image = state1, bomb = false, check = false, warns = 0}
 			
 		end
 	end
