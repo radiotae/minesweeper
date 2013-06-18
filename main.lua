@@ -5,6 +5,7 @@ grid = {}
 WIDTH = 256
 HEIGHT = 200
 --y=1
+--POSSIBLE USER INPUT LATER
 SCALE = 3
 cols = 6
 rows = 5
@@ -40,7 +41,7 @@ function love.load()
 		for x=1, cols, 1 do
 			for y=1, rows, 1 do
 				if grid[x][y].bomb == false then
-					local bombo = math.random(2)
+					local bombo = math.random(3)
 					--bombo = 1
 					if bombo == 1 then
 						grid[x][y].bomb = true
@@ -60,7 +61,7 @@ function love.load()
 			
 		end
 	end
-	
+	--sets warn variable to show how many bombs are around said tile IF the tile isn't a bomb itself
 	for x=1, cols, 1 do
 		for y=1, rows, 1 do
 			gr = grid[x][y]
@@ -124,6 +125,7 @@ function love.update(dt)
 			end
 		end
 	end
+	
 --Checks to see if mouse is released and if it is released on a square. If so, show square.
 --If released not on square, changed pressState back into neutralState
 	if ldown == false and
@@ -154,6 +156,7 @@ function love.update(dt)
 		mouseyr = nil
 	end
 	
+	--Checks the board to see if there are any empty tiles that have been checked on the board. If so, updates all the tiles around said tile.
 	for x=1,cols,1 do
 		for y=1, rows, 1 do
 			gr = grid[x][y]
@@ -234,6 +237,7 @@ function love.draw()
 	end
 end
 
+--Given x, returns image of correct number tile
 function warnImage(x)
 	if x == 0 then
 		return love.graphics.newImage("/data/nobombState.png")
