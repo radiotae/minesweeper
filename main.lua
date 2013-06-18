@@ -32,7 +32,7 @@ function love.load()
 			--local gr = grid[x][y]
 			--love.graphics.draw(grid[x][y].image, gr.xVal, gr.yVal)
 			
-			grid[x][y] = {xVal = 128*x, yVal = 100*y, image = state1, click = state2, bomb = false}
+			grid[x][y] = {xVal = 128*x, yVal = 100*y, image = state1, click = state2, bomb = false, check = false}
 			
 		end
 	end
@@ -68,7 +68,46 @@ function love.load()
 end
 
 function love.update(dt)
-	
+	if ldown == true then
+		for x=1, 5, 1 do
+			for y=1, 5, 1 do
+				local gr = grid[x][y]
+				if mousex >= gr.xVal and
+				mousex <= gr.xVal + 50 and
+				mousey >= gr.yVal and
+				mousey <= gr.yVal + 50 then
+					gr.image = love.graphics.newImage("/data/pressState.png")
+				end
+			end
+		end
+	else if ldown == false and
+	mousexr ~= nil and
+	mouseyr ~= nil then
+		for x=1, 5, 1 do
+			for y=1, 5, 1 do
+				local gr = grid[x][y]
+				
+				if mousexr >= gr.xVal and
+				mousexr <= gr.xVal + 50 and
+				mouseyr >= gr.yVal and
+				mouseyr <= gr.yVal + 50 then
+					if gr.bomb == true then
+						gr.image = love.graphics.newImage("/data/bombState.png")
+					else
+						gr.image = love.graphics.newImage("/data/nobombState.png")
+					end
+					gr.check = true
+				end
+				if gr.check == false then
+					gr.image = love.graphics.newImage("/data/neutralState.png")
+				end
+			end
+		end
+		mousexr = nil
+		mouseyr = nil
+	else
+	end
+	end
 end
 
 function love.mousepressed(x, y, button)
@@ -90,43 +129,10 @@ function love.mousereleased(x, y, button)
 end
 
 function love.draw()
-	--OK here's where shit gets stupid. I didn't think this all through so it's really bad code
-	--I iterate through another nested for loop and redraw the squares over and over again. If the mouse is pressed and in the location of one of the squares, it SHOULD load clickState.png at that spot
-	--when mouse is released, it SHOULD load bombState.png or nonbombState.png
-
 	for x=1, 5, 1 do
 		for y=1, 5, 1 do
-			
-			--local test = love.graphics.newImage("/data/neutralState.png")
-			--grid[x][y] = { xVal = 128*x, yVal = 100*y, image = test}
 			local gr = grid[x][y]
-			--love.graphics.draw(grid[x]["image"], grid[x][y]["xVal"], grid[x][y]["yVal"])
-			if mousex ~= nil and mousey ~= nil and
-			mousex >= gr.xVal and
-			mousex <= gr.xVal + 50 and
-			mousey >= gr.yVal and
-			mousey <= gr.yVal + 50 and
-			ldown == true then
-				love.graphics.draw(gr.click, gr.xVal, gr.yVal)
-			else		
-				love.graphics.draw(gr.image, gr.xVal, gr.yVal)
-			end
-			if mousexr ~= nil and mouseyr ~= nil and
-			mousexr >= gr.xVal and
-			mousexr <= gr.xVal + 50 and
-			mouseyr >= gr.yVal and
-			mouseyr <= gr.yVal + 50 and
-			ldown == false then
-				if gr.bomb == true then
-					gr.image = love.graphics.newImage("/data/bombState.png")
-				else if gr.bomb == false then
-					gr.image = love.graphics.newImage("/data/nobombState.png")
-				end
-			end
-			
+			love.graphics.draw(gr.image, gr.xVal, gr.yVal)
 		end
 	end
-	
-end
-
 end
