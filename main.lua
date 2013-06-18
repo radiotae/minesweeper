@@ -1,5 +1,5 @@
 --This is where I pretty much store all the grid data, like where its located on the screen, what image it should have, etc.
---it kind of blows right now tbh, there's an extra click state that makes shit confusing in the draw function
+--it kind of blows right now tbh
 grid = {}
 --self explanatory shit
 WIDTH = 256
@@ -24,15 +24,8 @@ function love.load()
 		for y=1, 5, 1 do
 			
 			local state1 = love.graphics.newImage("/data/neutralState.png")
-			local state2 = love.graphics.newImage("/data/pressState.png")
-			--grid[x][y] = { xVal = 128*x, yVal = 100*y, image = test}
-			--grid[x] = {}
-			--grid[x][y] = { xVal = 128*x, yVal = 100*y, image = test}
 			
-			--local gr = grid[x][y]
-			--love.graphics.draw(grid[x][y].image, gr.xVal, gr.yVal)
-			
-			grid[x][y] = {xVal = 128*x, yVal = 100*y, image = state1, click = state2, bomb = false, check = false}
+			grid[x][y] = {xVal = 128+((x-1)*60), yVal = 100+((y-1)*60), image = state1, bomb = false, check = false}
 			
 		end
 	end
@@ -68,6 +61,7 @@ function love.load()
 end
 
 function love.update(dt)
+--Checks to see if mouse is pressed and if it is pressed on a square. If so, change square to pressState
 	if ldown == true then
 		for x=1, 5, 1 do
 			for y=1, 5, 1 do
@@ -75,12 +69,16 @@ function love.update(dt)
 				if mousex >= gr.xVal and
 				mousex <= gr.xVal + 50 and
 				mousey >= gr.yVal and
-				mousey <= gr.yVal + 50 then
+				mousey <= gr.yVal + 50 and
+				gr.check == false then
 					gr.image = love.graphics.newImage("/data/pressState.png")
 				end
 			end
 		end
-	else if ldown == false and
+	end
+--Checks to see if mouse is released and if it is released on a square. If so, show square.
+--If released not on square, changed pressState back into neutralState
+	if ldown == false and
 	mousexr ~= nil and
 	mouseyr ~= nil then
 		for x=1, 5, 1 do
@@ -94,7 +92,70 @@ function love.update(dt)
 					if gr.bomb == true then
 						gr.image = love.graphics.newImage("/data/bombState.png")
 					else
-						gr.image = love.graphics.newImage("/data/nobombState.png")
+						local warnings = 0
+						if x-1 > 0 and
+						y-1 > 0 and
+						grid[x-1][y-1].bomb == true then
+							warnings = warnings + 1
+						end
+						if y-1 > 0 and
+						grid[x][y-1].bomb == true then
+							warnings = warnings + 1
+						end
+						if x+1 < 6 and
+						y-1 > 0 and
+						grid[x+1][y-1].bomb == true then
+							warnings = warnings + 1
+						end
+						if x-1 > 0 and
+						grid[x-1][y].bomb == true then
+							warnings = warnings + 1
+						end
+						if x+1 < 6 and
+						grid[x+1][y].bomb == true then
+							warnings = warnings + 1
+						end
+						if x-1 > 0 and
+						y+1 < 6 and
+						grid[x-1][y+1].bomb == true then
+							warnings = warnings + 1
+						end
+						if y+1 < 6 and
+						grid[x][y+1].bomb == true then
+							warnings = warnings + 1
+						end
+						if x+1 < 6 and
+						y+1 < 6 and
+						grid[x+1][y+1].bomb == true then
+							warnings = warnings + 1
+						end
+						if warnings == 0 then
+							gr.image = love.graphics.newImage("/data/nobombState.png")
+						else if warnings == 1 then
+							gr.image = love.graphics.newImage("/data/warn1State.png")
+						else if warnings == 2 then
+							gr.image = love.graphics.newImage("/data/warn2State.png")
+						else if warnings == 3 then
+							gr.image = love.graphics.newImage("/data/warn3State.png")
+						else if warnings == 4 then
+							gr.image = love.graphics.newImage("/data/warn4State.png")
+						else if warnings == 5 then
+							gr.image = love.graphics.newImage("/data/warn5State.png")
+						else if warnings == 6 then
+							gr.image = love.graphics.newImage("/data/warn6State.png")
+						else if warnings == 7 then
+							gr.image = love.graphics.newImage("/data/warn7State.png")
+						else if warnings == 8 then
+							gr.image = love.graphics.newImage("/data/warn8State.png")
+						end
+						end
+						end
+						end
+						end
+						end
+						end
+						end
+						end
 					end
 					gr.check = true
 				end
@@ -105,8 +166,6 @@ function love.update(dt)
 		end
 		mousexr = nil
 		mouseyr = nil
-	else
-	end
 	end
 end
 
@@ -129,6 +188,7 @@ function love.mousereleased(x, y, button)
 end
 
 function love.draw()
+--updates the board
 	for x=1, 5, 1 do
 		for y=1, 5, 1 do
 			local gr = grid[x][y]
