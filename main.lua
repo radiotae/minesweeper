@@ -6,6 +6,9 @@ WIDTH = 256
 HEIGHT = 200
 --y=1
 SCALE = 3
+cols = 6
+rows = 5
+bomblim = 7
 
 --setting mouse properties here
 mousex = nil
@@ -19,13 +22,13 @@ function love.load()
 	love.graphics.setMode(WIDTH*SCALE, HEIGHT*SCALE, false, false)
 	
 	--looping through a 5 by 5 array, given the x and y values I put the image, x and y value locations in the array
-	for x=1, 5, 1 do
+	for x=1, cols, 1 do
 		grid[x] = {}
-		for y=1, 5, 1 do
+		for y=1, rows, 1 do
 			
 			local state1 = love.graphics.newImage("/data/neutralState.png")
 			
-			grid[x][y] = {xVal = 128+((x-1)*60), yVal = 100+((y-1)*60), image = state1, bomb = false, check = false}
+			grid[x][y] = {xVal = 128+((x-1)*60), yVal = 100+((y-1)*60), image = state1, bomb = false, check = false, warns = 0}
 			
 		end
 	end
@@ -33,11 +36,11 @@ function love.load()
 	--I set the bombs
 	local bombs = 0
 	
-	while bombs < 5 do
-		for x=1, 5, 1 do
-			for y=1, 5, 1 do
+	while bombs < bomblim do
+		for x=1, cols, 1 do
+			for y=1, rows, 1 do
 				if grid[x][y].bomb == false then
-					bombo = math.random(2)
+					local bombo = math.random(2)
 					--bombo = 1
 					if bombo == 1 then
 						grid[x][y].bomb = true
@@ -45,26 +48,71 @@ function love.load()
 					end
 				end
 				
-				if bombs == 5 then
+				if bombs == bomblim then
 					break
 				end
 				
 			end
 			
-			if bombs == 5 then
+			if bombs == bomblim then
 				break
 			end
 			
 		end
 	end
 	
+	for x=1, cols, 1 do
+		for y=1, rows, 1 do
+			gr = grid[x][y]
+			local warnings = 0
+			if gr.bomb == false then
+				if x-1 > 0 and
+				y-1 > 0 and
+				grid[x-1][y-1].bomb == true then
+					warnings = warnings + 1
+				end
+				if y-1 > 0 and
+				grid[x][y-1].bomb == true then
+					warnings = warnings + 1
+				end
+				if x+1 <= cols and
+				y-1 > 0 and
+				grid[x+1][y-1].bomb == true then
+					warnings = warnings + 1
+				end
+				if x-1 > 0 and
+				grid[x-1][y].bomb == true then
+					warnings = warnings + 1
+				end
+				if x+1 <= cols and
+				grid[x+1][y].bomb == true then
+					warnings = warnings + 1
+				end
+				if x-1 > 0 and
+				y+1 <= rows and
+				grid[x-1][y+1].bomb == true then
+					warnings = warnings + 1
+				end
+				if y+1 <= rows and
+				grid[x][y+1].bomb == true then
+					warnings = warnings + 1
+				end
+				if x+1 <= cols and
+				y+1 <= rows and
+				grid[x+1][y+1].bomb == true then
+					warnings = warnings + 1
+				end
+			end
+			gr.warns = warnings
+		end
+	end
 end
 
 function love.update(dt)
 --Checks to see if mouse is pressed and if it is pressed on a square. If so, change square to pressState
 	if ldown == true then
-		for x=1, 5, 1 do
-			for y=1, 5, 1 do
+		for x=1, cols, 1 do
+			for y=1, rows, 1 do
 				local gr = grid[x][y]
 				if mousex >= gr.xVal and
 				mousex <= gr.xVal + 50 and
@@ -81,8 +129,8 @@ function love.update(dt)
 	if ldown == false and
 	mousexr ~= nil and
 	mouseyr ~= nil then
-		for x=1, 5, 1 do
-			for y=1, 5, 1 do
+		for x=1, cols, 1 do
+			for y=1, rows, 1 do
 				local gr = grid[x][y]
 				
 				if mousexr >= gr.xVal and
@@ -92,70 +140,8 @@ function love.update(dt)
 					if gr.bomb == true then
 						gr.image = love.graphics.newImage("/data/bombState.png")
 					else
-						local warnings = 0
-						if x-1 > 0 and
-						y-1 > 0 and
-						grid[x-1][y-1].bomb == true then
-							warnings = warnings + 1
-						end
-						if y-1 > 0 and
-						grid[x][y-1].bomb == true then
-							warnings = warnings + 1
-						end
-						if x+1 < 6 and
-						y-1 > 0 and
-						grid[x+1][y-1].bomb == true then
-							warnings = warnings + 1
-						end
-						if x-1 > 0 and
-						grid[x-1][y].bomb == true then
-							warnings = warnings + 1
-						end
-						if x+1 < 6 and
-						grid[x+1][y].bomb == true then
-							warnings = warnings + 1
-						end
-						if x-1 > 0 and
-						y+1 < 6 and
-						grid[x-1][y+1].bomb == true then
-							warnings = warnings + 1
-						end
-						if y+1 < 6 and
-						grid[x][y+1].bomb == true then
-							warnings = warnings + 1
-						end
-						if x+1 < 6 and
-						y+1 < 6 and
-						grid[x+1][y+1].bomb == true then
-							warnings = warnings + 1
-						end
-						if warnings == 0 then
-							gr.image = love.graphics.newImage("/data/nobombState.png")
-						else if warnings == 1 then
-							gr.image = love.graphics.newImage("/data/warn1State.png")
-						else if warnings == 2 then
-							gr.image = love.graphics.newImage("/data/warn2State.png")
-						else if warnings == 3 then
-							gr.image = love.graphics.newImage("/data/warn3State.png")
-						else if warnings == 4 then
-							gr.image = love.graphics.newImage("/data/warn4State.png")
-						else if warnings == 5 then
-							gr.image = love.graphics.newImage("/data/warn5State.png")
-						else if warnings == 6 then
-							gr.image = love.graphics.newImage("/data/warn6State.png")
-						else if warnings == 7 then
-							gr.image = love.graphics.newImage("/data/warn7State.png")
-						else if warnings == 8 then
-							gr.image = love.graphics.newImage("/data/warn8State.png")
-						end
-						end
-						end
-						end
-						end
-						end
-						end
-						end
-						end
+						local warnings = gr.warns
+						gr.image = warnImage(warnings)
 					end
 					gr.check = true
 				end
@@ -167,6 +153,57 @@ function love.update(dt)
 		mousexr = nil
 		mouseyr = nil
 	end
+	
+	for x=1,cols,1 do
+		for y=1, rows, 1 do
+			gr = grid[x][y]
+			if gr.warns == 0 and gr.check == true and
+			gr.bomb == false then
+				if x-1 > 0 and
+				y-1 > 0 then
+					warnings = grid[x-1][y-1].warns
+					grid[x-1][y-1].image = warnImage(warnings)
+					grid[x-1][y-1].check = true
+				end
+				if y-1 > 0 then
+					warnings = grid[x][y-1].warns
+					grid[x][y-1].image = warnImage(warnings)
+					grid[x][y-1].check = true
+				end
+				if x+1 <= cols and y-1 > 0 then
+					warnings = grid[x+1][y-1].warns
+					grid[x+1][y-1].image = warnImage(warnings)
+					grid[x+1][y-1].check = true
+				end
+				if x-1 > 0 then
+					warnings = grid[x-1][y].warns
+					grid[x-1][y].image = warnImage(warnings)
+					grid[x-1][y].check = true
+				end
+				if x+1 <= cols then
+					warnings = grid[x+1][y].warns
+					grid[x+1][y].image = warnImage(warnings)
+					grid[x+1][y].check = true
+				end
+				if x-1 > 0 and y+1 <= rows then
+					warnings = grid[x-1][y+1].warns
+					grid[x-1][y+1].image = warnImage(warnings)
+					grid[x-1][y+1].check = true
+				end
+				if y+1 <= rows then
+					warnings = grid[x][y+1].warns
+					grid[x][y+1].image = warnImage(warnings)
+					grid[x][y+1].check = true
+				end
+				if x+1 <= cols and y+1 <= rows then
+					warnings = grid[x+1][y+1].warns
+					grid[x+1][y+1].image = warnImage(warnings)
+					grid[x+1][y+1].check = true
+				end
+			end
+		end
+	end
+	
 end
 
 function love.mousepressed(x, y, button)
@@ -189,10 +226,41 @@ end
 
 function love.draw()
 --updates the board
-	for x=1, 5, 1 do
-		for y=1, 5, 1 do
+	for x=1, cols, 1 do
+		for y=1, rows, 1 do
 			local gr = grid[x][y]
 			love.graphics.draw(gr.image, gr.xVal, gr.yVal)
 		end
 	end
+end
+
+function warnImage(x)
+	if x == 0 then
+		return love.graphics.newImage("/data/nobombState.png")
+	end
+	if x == 1 then
+		return love.graphics.newImage("/data/warn1State.png")
+	end
+	if x == 2 then
+		return love.graphics.newImage("/data/warn2State.png")
+	end
+	if x == 3 then
+		return love.graphics.newImage("/data/warn3State.png")
+	end
+	if x == 4 then
+		return love.graphics.newImage("/data/warn4State.png")
+	end
+	if x == 5 then
+		return love.graphics.newImage("/data/warn5State.png")
+	end
+	if x == 6 then
+		return love.graphics.newImage("/data/warn6State.png")
+	end
+	if x == 7 then
+		return love.graphics.newImage("/data/warn7State.png")
+	end
+	if x == 8 then
+		return love.graphics.newImage("/data/warn8State.png")
+	end
+	
 end
