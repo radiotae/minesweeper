@@ -1,9 +1,13 @@
+--This is where I pretty much store all the grid data, like where its located on the screen, what image it should have, etc.
+--it kind of blows right now tbh, there's an extra click state that makes shit confusing in the draw function
 grid = {}
+--self explanatory shit
 WIDTH = 256
 HEIGHT = 200
 --y=1
 SCALE = 3
 
+--setting mouse properties here
 mousex = nil
 mousey = nil
 mousexr = nil
@@ -11,8 +15,10 @@ mouseyr = nil
 ldown = false
 
 function love.load()
+	--screen size
 	love.graphics.setMode(WIDTH*SCALE, HEIGHT*SCALE, false, false)
 	
+	--looping through a 5 by 5 array, given the x and y values I put the image, x and y value locations in the array
 	for x=1, 5, 1 do
 		grid[x] = {}
 		for y=1, 5, 1 do
@@ -30,6 +36,8 @@ function love.load()
 			
 		end
 	end
+	
+	--I set the bombs
 	local bombs = 0
 	
 	while bombs < 5 do
@@ -64,6 +72,7 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y, button)
+	--when mouse is pressed it just saves the location and checks makes ldown true
 	if button == 'l' then
 		mousex = x
 		mousey = y
@@ -72,6 +81,7 @@ function love.mousepressed(x, y, button)
 end
 
 function love.mousereleased(x, y, button)
+	--saves location values and sets ldown false
 	if button == 'l' then
 		ldown = false
 		mousexr = x
@@ -80,11 +90,9 @@ function love.mousereleased(x, y, button)
 end
 
 function love.draw()
-	--love.graphics.setColor(255,255,255,255)
-	--EH WHATEVER
-	--love.graphics.rectangle("fill",128,100,20,10)
-	--local image = love.graphics.newImage("/data/neutralState.png")
-	--love.graphics.draw(image, 128, 100)
+	--OK here's where shit gets stupid. I didn't think this all through so it's really bad code
+	--I iterate through another nested for loop and redraw the squares over and over again. If the mouse is pressed and in the location of one of the squares, it SHOULD load clickState.png at that spot
+	--when mouse is released, it SHOULD load bombState.png or nonbombState.png
 
 	for x=1, 5, 1 do
 		for y=1, 5, 1 do
