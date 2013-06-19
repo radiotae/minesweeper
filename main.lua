@@ -9,7 +9,7 @@ HEIGHT = 200
 SCALE = 3
 cols = 13
 rows = 9
-bomblim = 7
+bomblim = 10
 
 --setting mouse properties here
 mousex = nil
@@ -141,54 +141,9 @@ function love.update(dt)
 	end
 	
 	--Checks the board to see if there are any empty tiles that have been checked on the board. If so, updates all the tiles around said tile.
-	for x=1,cols,1 do
-		for y=1, rows, 1 do
-			gr = grid[x][y]
-			if gr.warns == 0 and gr.check == true and
-			gr.bomb == false then
-				if x-1 > 0 and
-				y-1 > 0 then
-					warnings = grid[x-1][y-1].warns
-					grid[x-1][y-1].image = warnImage(warnings)
-					grid[x-1][y-1].check = true
-				end
-				if y-1 > 0 then
-					warnings = grid[x][y-1].warns
-					grid[x][y-1].image = warnImage(warnings)
-					grid[x][y-1].check = true
-				end
-				if x+1 <= cols and y-1 > 0 then
-					warnings = grid[x+1][y-1].warns
-					grid[x+1][y-1].image = warnImage(warnings)
-					grid[x+1][y-1].check = true
-				end
-				if x-1 > 0 then
-					warnings = grid[x-1][y].warns
-					grid[x-1][y].image = warnImage(warnings)
-					grid[x-1][y].check = true
-				end
-				if x+1 <= cols then
-					warnings = grid[x+1][y].warns
-					grid[x+1][y].image = warnImage(warnings)
-					grid[x+1][y].check = true
-				end
-				if x-1 > 0 and y+1 <= rows then
-					warnings = grid[x-1][y+1].warns
-					grid[x-1][y+1].image = warnImage(warnings)
-					grid[x-1][y+1].check = true
-				end
-				if y+1 <= rows then
-					warnings = grid[x][y+1].warns
-					grid[x][y+1].image = warnImage(warnings)
-					grid[x][y+1].check = true
-				end
-				if x+1 <= cols and y+1 <= rows then
-					warnings = grid[x+1][y+1].warns
-					grid[x+1][y+1].image = warnImage(warnings)
-					grid[x+1][y+1].check = true
-				end
-			end
-		end
+	local check = true
+	while check == true do
+		check = emptyCheck(grid)
 	end
 	
 end
@@ -251,4 +206,82 @@ function warnImage(x)
 		return love.graphics.newImage("/data/warn8State.png")
 	end
 	
+end
+
+function emptyCheck(grid)
+	emptyStates = false
+	for x=1,cols,1 do
+		for y=1, rows, 1 do
+			gr = grid[x][y]
+			if gr.warns == 0 and gr.check == true and
+			gr.bomb == false then
+				if x-1 > 0 and
+				y-1 > 0 then
+					warnings = grid[x-1][y-1].warns
+					grid[x-1][y-1].image = warnImage(warnings)
+					grid[x-1][y-1].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if y-1 > 0 then
+					warnings = grid[x][y-1].warns
+					grid[x][y-1].image = warnImage(warnings)
+					grid[x][y-1].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if x+1 <= cols and y-1 > 0 then
+					warnings = grid[x+1][y-1].warns
+					grid[x+1][y-1].image = warnImage(warnings)
+					grid[x+1][y-1].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if x-1 > 0 then
+					warnings = grid[x-1][y].warns
+					grid[x-1][y].image = warnImage(warnings)
+					grid[x-1][y].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if x+1 <= cols then
+					warnings = grid[x+1][y].warns
+					grid[x+1][y].image = warnImage(warnings)
+					grid[x+1][y].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if x-1 > 0 and y+1 <= rows then
+					warnings = grid[x-1][y+1].warns
+					grid[x-1][y+1].image = warnImage(warnings)
+					grid[x-1][y+1].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if y+1 <= rows then
+					warnings = grid[x][y+1].warns
+					grid[x][y+1].image = warnImage(warnings)
+					grid[x][y+1].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+				if x+1 <= cols and y+1 <= rows then
+					warnings = grid[x+1][y+1].warns
+					grid[x+1][y+1].image = warnImage(warnings)
+					grid[x+1][y+1].check = true
+					if warnings == 0 then
+						emptyStates = true
+					end
+				end
+			end
+		end
+	end
+	return emptyStates
 end
